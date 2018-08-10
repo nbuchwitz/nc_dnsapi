@@ -1,6 +1,8 @@
 import requests
 import json
 
+name = "nc_dns"
+
 
 class DNSZone(object):
     def __init__(self, name, ttl, serial, refresh, retry, expire, dnssecstatus):

@@ -1,27 +1,26 @@
 #!/usr/bin/env python
 
-from setuptools import setup
+import setuptools
 
-setup(
-        name='nc_dnsapi',
-        version='0.1.0',
-        description='API wrapper for the netcup DNS api',
-        author='Nicolai Buchwitz',
-        author_email='nb@tipi-net.de',
-        zip_safe=False,
-        include_package_data=True,
-        classifiers=[
-            'Development Status :: 4 - Beta',
-            'Intended Audience :: Developers',
-            'License :: OSI Approved :: BSD License',
-            'Natural Language :: English',
-            'Operating System :: POSIX :: Linux',
-            'Programming Language :: Python',
-            ],
-        install_requires=[
-            'requests',
-            ],
-        packages=[
-            'nc_dnsapi',
-            ],
-        )
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
+setuptools.setup(
+    name='nc_dnsapi',
+    version='0.0.1',
+    description='API wrapper for the netcup DNS api',
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    author='Nicolai Buchwitz',
+    author_email='nb@tipi-net.de',
+    url='https://github.com/nbuchwitz/nc_dnsapi',
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+        'Operating System :: OS Independent',
+    ],
+    install_requires=[
+        'requests',
+    ],
+    packages=setuptools.find_packages(),
+)
