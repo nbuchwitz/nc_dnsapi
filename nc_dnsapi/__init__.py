@@ -21,9 +21,9 @@ class DNSZone(object):
 class DNSRecord(object):
     __valid_types = ['A', 'AAAA', 'MX', 'CNAME', 'CAA', 'SRV', 'TXT', 'TLSA', 'NS', 'DS']
 
-    def __init__(self, hostname, record_type, destination, **kwargs):
+    def __init__(self, hostname, type, destination, **kwargs):
         self.hostname = hostname
-        self.type = record_type.upper()
+        self.type = type.upper()
         self.destination = destination
         self.priority = kwargs.get("priority", 0)
         self.id = kwargs.get("id", "")
