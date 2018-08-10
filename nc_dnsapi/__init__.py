@@ -17,6 +17,9 @@ class DNSZone(object):
     def __str__(self):
         return str(self.__dict__)
 
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
 
 class DNSRecord(object):
     __valid_types = ['A', 'AAAA', 'MX', 'CNAME', 'CAA', 'SRV', 'TXT', 'TLSA', 'NS', 'DS']
@@ -25,8 +28,8 @@ class DNSRecord(object):
         self.hostname = hostname
         self.type = type.upper()
         self.destination = destination
-        self.priority = kwargs.get("priority", 0)
-        self.id = kwargs.get("id", "")
+        self.priority = kwargs.get("priority", None)
+        self.id = kwargs.get("id", None)
         self.deleterecord = kwargs.get("deleterecord", False)
         self.state = True
 
@@ -35,6 +38,9 @@ class DNSRecord(object):
 
     def __str__(self):
         return str(self.__dict__)
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
 
 
 class Client(object):
@@ -48,8 +54,8 @@ class Client(object):
             "customernumber": self.__customer,
         })
 
-        if "apipassword" in kwargs:
-            params.update({kwargs.get("apipassword")})
+        if "apipassword" not in params and not self.__api_session_id:
+            raise Exception("Request was called on closed connection")
 
         if self.__api_session_id:
             params.update({"apisessionid": self.__api_session_id})
@@ -75,15 +81,16 @@ class Client(object):
 
     def logout(self):
         self.request("logout")
+        self.__api_session_id = None
 
     def login(self):
         data = self.request("login", params={"apipassword": self.__api_password})
         self.__api_session_id = data['responsedata']['apisessionid']
 
-    def add_dns_record(self, domain, record: DNSRecord):
+    def add_dns_record(self, domain, record):
         self.update_dns_records(domain, [record])
 
-    def update_dns_record(self, domain, record: DNSRecord):
+    def update_dns_record(self, domain, record):
         if not record.id:
             raise ValueError("Missing id of record to update")
 
@@ -98,7 +105,7 @@ class Client(object):
             "dnsrecordset": {"dnsrecords": [record.__dict__ for record in records]}
         })
 
-    def delete_dns_record(self, domain, record: DNSRecord, ignore_unknown=True):
+    def delete_dns_record(self, domain, record, ignore_unknown=True):
         if not record.id:
             raise ValueError("Missing id of record to update")
 
@@ -114,7 +121,7 @@ class Client(object):
         data = self.request("infoDnsRecords", params={"domainname": domain})
         return [DNSRecord(**r) for r in data['responsedata']['dnsrecords']]
 
-    def update_dns_zone(self, domain, zone: DNSZone):
+    def update_dns_zone(self, domain, zone):
         if not isinstance(zone, DNSZone):
             raise TypeError("Zone has to be instance of DNSZone")
 
@@ -133,8 +140,9 @@ class Client(object):
         self.__api_password = api_password
         self.__api_timeout = timeout
 
-    def __enter__(self):
         self.login()
+
+    def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
