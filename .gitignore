@@ -1,2 +1,5 @@
 venv
 .idea
+dist
+build
+nc_dnsapi.egg-info
