@@ -131,7 +131,7 @@ class Client(object):
         return None
 
     def delete_dns_record(self, domain, record, ignore_unknown=True):
-        if not record.id:
+        if not record or not record.id:
             raise ValueError("Missing id of record to update")
 
         record.deleterecord = True
