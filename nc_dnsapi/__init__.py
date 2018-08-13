@@ -116,7 +116,7 @@ class Client(object):
             "dnsrecordset": {"dnsrecords": [record.__dict__ for record in records]}
         })
 
-        return data['responsedata']['dnsrecords']
+        return [DNSRecord(**r) for r in data['responsedata']['dnsrecords']]
 
     def dns_record_exists(self, domain, record):
         return record in self.dns_records(domain)
