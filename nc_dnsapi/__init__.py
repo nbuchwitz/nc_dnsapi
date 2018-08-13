@@ -85,6 +85,9 @@ class Client(object):
 
             if data['status'] == 'success':
                 return data
+            # empty dns zone
+            elif data['statuscode'] == 5029:
+                return []
             else:
                 raise Exception("{} ({})".format(data['longmessage'], data['statuscode']))
         else:
@@ -115,6 +118,9 @@ class Client(object):
             "domainname": domain,
             "dnsrecordset": {"dnsrecords": [record.__dict__ for record in records]}
         })
+
+        if 'responsedata' not in data:
+            return []
 
         return [DNSRecord(**r) for r in data['responsedata']['dnsrecords']]
 
@@ -152,6 +158,10 @@ class Client(object):
 
     def dns_records(self, domain):
         data = self.request("infoDnsRecords", params={"domainname": domain})
+
+        if 'responsedata' not in data:
+            return []
+
         return [DNSRecord(**r) for r in data['responsedata']['dnsrecords']]
 
     def update_dns_zone(self, domain, zone):
