@@ -3,3 +3,5 @@ venv
 dist
 build
 nc_dnsapi.egg-info
+__pycache__
+*.pyc
