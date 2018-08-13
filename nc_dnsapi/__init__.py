@@ -40,7 +40,18 @@ class DNSRecord(object):
         return str(self.__dict__)
 
     def __eq__(self, other):
-        return self.__dict__ == other.__dict__
+        if not isinstance(other, DNSRecord):
+            return False
+
+        result = self.hostname == other.hostname and self.destination == other.destination and self.type == other.type
+
+        if self.type == 'MX' and other.type == self.type and self.priority:
+            result = result and int(self.priority) == int(other.priority)
+
+        if self.id:
+            result = result and self.id == other.id
+
+        return result
 
 
 class Client(object):
@@ -88,22 +99,36 @@ class Client(object):
         self.__api_session_id = data['responsedata']['apisessionid']
 
     def add_dns_record(self, domain, record):
-        self.update_dns_records(domain, [record])
+        return self.update_dns_records(domain, [record])
 
     def update_dns_record(self, domain, record):
         if not record.id:
             raise ValueError("Missing id of record to update")
 
-        self.update_dns_records(domain, [record])
+        return self.update_dns_records(domain, [record])
 
     def update_dns_records(self, domain, records):
         if not all(isinstance(r, DNSRecord) for r in records):
             raise TypeError("Record has to be instance of DNSRecord")
 
-        self.request("updateDnsRecords", params={
+        data = self.request("updateDnsRecords", params={
             "domainname": domain,
             "dnsrecordset": {"dnsrecords": [record.__dict__ for record in records]}
         })
+
+        return data['responsedata']['dnsrecords']
+
+    def dns_record_exists(self, domain, record):
+        return record in self.dns_records(domain)
+
+    def dns_record(self, domain, record):
+        records = self.dns_records(domain)
+
+        for r in records:
+            if record == r:
+                return r
+
+        return None
 
     def delete_dns_record(self, domain, record, ignore_unknown=True):
         if not record.id:
@@ -112,10 +137,18 @@ class Client(object):
         record.deleterecord = True
 
         try:
-            self.update_dns_records(domain, [record])
+            return self.update_dns_records(domain, [record])
         except Exception as ex:
             if not ignore_unknown:
                 raise ex
+            else:
+                return []
+
+    def delete_dns_records(self, domain, records):
+        for r in records:
+            r.deleterecord = True
+
+        return self.update_dns_records(domain, records)
 
     def dns_records(self, domain):
         data = self.request("infoDnsRecords", params={"domainname": domain})
