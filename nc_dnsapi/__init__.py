@@ -48,7 +48,7 @@ class DNSRecord(object):
         if self.type == 'MX' and other.type == self.type and self.priority:
             result = result and int(self.priority) == int(other.priority)
 
-        if self.id:
+        if self.id and other.id:
             result = result and self.id == other.id
 
         return result
