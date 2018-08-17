@@ -2,13 +2,13 @@
 A simple API wrapper for the netcup DNS API
 
 ```python
-import nc_dnsapi
+from nc_dnsapi import Client, DNSRecord
 
 customer = 123456
 api_key = "your-personal-api-key"
 api_password = "your-private-api-password"
 
-with nc_dnsapi.Client(customer, api_key, api_password) as api:
+with Client(customer, api_key, api_password) as api:
     # fetch records
     records = api.dns_records("example.com")
     print(records)

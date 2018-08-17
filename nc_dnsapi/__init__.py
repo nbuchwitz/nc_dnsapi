@@ -37,7 +37,13 @@ class DNSRecord(object):
             raise TypeError("Invalid record type: {}".format(self.type))
 
     def __str__(self):
-        return str(self.__dict__)
+        return '{}({})'.format(self.__class__.__name__, ', '.join(
+            '{}={!r}'.format(k, v)
+            for k, v in self.__dict__.items()
+            if v is not None
+        ))
+
+    __repr__ = __str__
 
     def __eq__(self, other):
         if not isinstance(other, DNSRecord):
