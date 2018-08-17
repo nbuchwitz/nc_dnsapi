@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='nc_dnsapi',
-    version='0.1.4',
+    version='0.1.5',
     description='API wrapper for the netcup DNS api',
     long_description=long_description,
     long_description_content_type="text/markdown",
