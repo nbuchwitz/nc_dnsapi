@@ -11,7 +11,8 @@ api_password = "your-private-api-password"
 with Client(customer, api_key, api_password) as api:
     # fetch records
     records = api.dns_records("example.com")
-    print(records)
+    for record in records:
+	print(record)
     
     # fetch zone details
     zone = api.dns_zone("example.com")
