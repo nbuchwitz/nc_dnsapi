@@ -91,13 +91,18 @@ class Client(object):
 
             if data['status'] == 'success':
                 return data
-            # empty dns zone
             elif data['statuscode'] == 5029:
+                # empty dns zone
                 return []
             else:
-                raise Exception("{} ({})".format(data['longmessage'], data['statuscode']))
+                exception_message = f"{data['longmessage']} ({data['statuscode']})"
+                if data['statuscode'] == 4013 and action == "login":
+                    exception_message += ". This error occured during login and is usually caused" \
+                        " by wrong API credentials. Please check the provided values."
+
+                raise Exception(exception_message)
         else:
-            raise Exception("{} ({})".format(response.reason, response.status_code))
+            raise Exception("f{response.reason} ({response.status_code})")
 
     def logout(self):
         self.request("logout")
